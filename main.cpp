@@ -13,10 +13,11 @@ using namespace std;
 using namespace cv;
 Inp<double> In_img[784];
 Layer<double> layer0(784);
-Layer<double> layer1(16);
-Layer<double> layer2(16);
+int size_l1 = 500, size_l2 = 200;
+Layer<double> layer1(size_l1);
+Layer<double> layer2(size_l2);
 Layer<double> layer3(10);
-double wes1[16][784], wes2[16][16], wes3[10][16];
+double wes1[/*size_l1*/500][784], wes2[/*size_l2*/200][/*size_l1*/500], wes3[10][/*size_l2*/200];
 Mat img;
 string addres_to_doc = "C:\\projects\\ITLab\\dop\\Itog\\tmp\\Debug\\doc\\"; //обязательно, что бы все адреса заканчивались "\\", так как
 string addres_to_mnist_training = "C:\\projects\\ITLab\\dop\\Itog\\tmp\\Debug\\mnist_png\\training\\";//сразу за ними идут или названия  
@@ -84,20 +85,20 @@ double ran_chislo_0() {
 
 void all_rand_wes() {
   //вес1
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < size_l1; i++) {
     for (int j = 0; j < 784; j++) {
       wes1[i][j]= ran_chislo_0();
     }
   }
   //вес2
-  for (int i = 0; i < 16; i++) {
-    for (int j = 0; j < 16; j++) {
+  for (int i = 0; i < size_l2; i++) {
+    for (int j = 0; j < size_l1; j++) {
       wes2[i][j] = ran_chislo_0();
     }
   }
   //вес3
   for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 16; j++) {
+    for (int j = 0; j < size_l2; j++) {
       wes3[i][j] = ran_chislo_0();
     }
   }
@@ -109,12 +110,12 @@ void wes_in_layer(int nom_layer, int nom_p) {
     }
   }
   if (nom_layer == 2) {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < size_l1; i++) {
       layer1[i].ChangeW(wes2[nom_p][i]);
     }
   }
   if (nom_layer == 3) {
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < size_l2; i++) {
       layer2[i].ChangeW(wes3[nom_p][i]);
     }
   }
@@ -331,7 +332,7 @@ int main()
   all_rand_wes();
   int group = 0;
   string add="";
-  int k = 1000;
+  int k = 200;
   cout << "Проходит " << k << " картинок." << endl;
   for (int i = 0; i < k; i++) { //2000 
     group = ceach_file_training_group_png(i);
@@ -349,14 +350,14 @@ int main()
       }
     }
     f = i;
-    if (((f % 100)==0)&&(f>0)) {
+    if (((f % 10)==0)&&(f>0)) {
       cout << i << " картинок прошло." << endl;
       b = g; g = 0;
       for (int j = 0; j < 10; j++) {
         g += good[j];
       }
-      db = (100-(g-b))/ (g - b);
-      cout << "good res- " << (g - b) << ", bad res- " << 100 - (g - b) <<" , отношение- "<< db<< endl;
+      db = (10-(g-b))/ (g - b);
+      cout << "good res- " << (g - b) << ", bad res- " << 10 - (g - b) <<" , отношение- "<< db<< endl;
     }
   }
   for (int i = 0; i < 10; i++) {
